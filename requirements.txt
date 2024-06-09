@@ -1,0 +1,7 @@
+numpy~=1.26.4
+tensorflow~=2.16.1
+pandas~=2.2.2
+setuptools~=60.2.0
+matplotlib~=3.9.0
+pillow~=10.3.0
+keras~=3.3.3
