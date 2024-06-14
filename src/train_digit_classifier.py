@@ -26,27 +26,42 @@ def main():
     val_dataset = dataset.skip(train_size).take(val_size).batch(32)
 
     data_augmentation = tf.keras.Sequential([
-        tf.keras.layers.RandomFlip("horizontal_and_vertical"),
+        tf.keras.layers.RandomFlip("horizontal"),
         tf.keras.layers.RandomRotation(0.2),
+        tf.keras.layers.RandomZoom(0.1),
+        tf.keras.layers.RandomContrast(0.1)
     ])
 
     model = tf.keras.models.Sequential([
         tf.keras.layers.InputLayer(shape=(224, 224, 3)),
         data_augmentation,
-        tf.keras.layers.Conv2D(32, (3, 3), activation='relu'),
+        tf.keras.layers.Conv2D(32, (3, 3), activation='relu', padding='same'),
+        tf.keras.layers.BatchNormalization(),
         tf.keras.layers.MaxPooling2D((2, 2)),
-        tf.keras.layers.Conv2D(64, (3, 3), activation='relu'),
+        tf.keras.layers.Dropout(0.25),
+
+        tf.keras.layers.Conv2D(64, (3, 3), activation='relu', padding='same'),
+        tf.keras.layers.BatchNormalization(),
         tf.keras.layers.MaxPooling2D((2, 2)),
-        tf.keras.layers.Conv2D(128, (3, 3), activation='relu'),
+        tf.keras.layers.Dropout(0.25),
+
+        tf.keras.layers.Conv2D(128, (3, 3), activation='relu', padding='same'),
+        tf.keras.layers.BatchNormalization(),
         tf.keras.layers.MaxPooling2D((2, 2)),
+        tf.keras.layers.Dropout(0.25),
+
         tf.keras.layers.Flatten(),
         tf.keras.layers.Dense(128, activation='relu'),
+        tf.keras.layers.BatchNormalization(),
+        tf.keras.layers.Dropout(0.5),
         tf.keras.layers.Dense(10, activation='softmax')
     ])
 
-    model.compile(optimizer='adam',
-                  loss='categorical_crossentropy',
+    model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
+                  loss='sparse_categorical_crossentropy',
                   metrics=['accuracy'])
+
+    model.summary()
 
     checkpoint_dir = 'checkpoints'
     if not os.path.exists(checkpoint_dir):
@@ -58,15 +73,15 @@ def main():
                                            monitor='val_loss', save_best_only=True)
     ]
 
-    history = model.fit(train_dataset, epochs=EPOCHS, validation_data=val_dataset, callbacks=callbacks)
-
-    save_history(history)
-    save_model(model)
+    try:
+        history = model.fit(train_dataset, epochs=EPOCHS, validation_data=val_dataset, callbacks=callbacks)
+        save_history(history)
+    except Exception as e:
+        print(e)
+        save_model(model)
 
     loss, accuracy = model.evaluate(val_dataset)
     print(f'Validation accuracy: {accuracy:.4f}')
-
-    plot_evaluations(history)
 
 
 def plot_evaluations(history):

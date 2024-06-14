@@ -173,12 +173,7 @@ def train_bbox():
                                            monitor='val_loss', save_best_only=True)
     ]
 
-    try:
-        history = model.fit(train_dataset, epochs=EPOCHS, validation_data=val_dataset, callbacks=callbacks)
-    except Exception as e:
-        print(e)
-        save_model(model)
-        save_history(history)
+    history = model.fit(train_dataset, epochs=EPOCHS, validation_data=val_dataset, callbacks=callbacks)
 
     save_history(history)
     save_model(model)

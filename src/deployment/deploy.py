@@ -35,14 +35,17 @@ def prediction(model_path: str, image_path: str):
         return None
 
 
+
 def plot_image_with_class(image, predicted_class):
+    fig = plt.figure(figsize=(3, 6))
     plt.imshow(image)
     plt.title(f'Predicted Class: {predicted_class}')
     plt.axis('off')
+    plt.savefig('prediction.png', dpi=fig.dpi)
     plt.show()
 
 
 if __name__ == '__main__':
-    model_path = 'C:/Users/Chris/PycharmProjects/MachineLearning_BA/src/model/epochs50_BS32_TS128_digit_classifier.keras'
-    image_path = 'C:/Users/Chris/PycharmProjects/MachineLearning_BA/data/Barcode_Digits/barcode_003_png.rf.5b2984e2a1a0eda3cfa533d15c3d19b8.jpg_9.jpg'
+    model_path = 'C:/Users/Chris/PycharmProjects/MachineLearning_BA/models/epochs50_BS32_TS128_digit_classifier.keras'
+    image_path = 'C:/Users/Chris/PycharmProjects/MachineLearning_BA/data/Barcode_Digits/IMG_2995_MOV-0012_jpg.rf.4e1135447449ae336160084096c53bd4.jpg_9.jpg'
     prediction(model_path, image_path)
